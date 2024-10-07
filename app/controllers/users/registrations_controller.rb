@@ -10,8 +10,8 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def register_success
-    token = encode_token(@user)
-    render json: { message: 'Signed up sucessfully.', user: @user, token: token}, status: :created
+    token = encode_token(resource.as_json)
+    render json: { message: 'Signed up successfully.', user: resource, token: token}, status: :created
   end
 
   def register_failed resource

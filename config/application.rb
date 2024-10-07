@@ -93,5 +93,8 @@ module SomniVerceAiapi
     config.action_controller.forgery_protection_origin_check = false
     config.autoload_lib(ignore: %w(assets tasks))
     config.api_only = true
+    config.session_store :cookie_store, key: 'somniaaap'
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
   end
 end
