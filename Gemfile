@@ -57,3 +57,6 @@ gem "ruby-openai"
 gem "rack-cors"
 
 gem 'jwt'
+
+gem 'sass-rails', '>= 6'
+gem 'webpacker', '~> 5.0' # or the version you're using
