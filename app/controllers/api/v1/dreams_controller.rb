@@ -1,18 +1,18 @@
 class Api::V1::DreamsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_dream, only: [:show, :update, :destroy]
+  before_action :set_dream, only: [:show, :update, :destroy, :restore]
 
   # GET /dreams
   def index
     @dreams = Dream.where(user_id: current_user.id).order(datedream: :desc)
-    if params[:deleted].present?
-      @dreams = @dreams.where(deleted: params[:deleted] == 'true')
-    end
-    if params[:complete].present?
-      @dreams = @dreams.where(complete: params[:complete] == 'true')
-    end
-    render json: {dreams: @dreams}
 
+    if params[:deleted].present?
+      @dreams = @dreams.where(deleted: true, complete: false)
+    else
+      @dreams = @dreams.where(deleted: false, complete: false)
+    end
+
+    render json: {dreams: @dreams}
   end
 
   # GET /dreams/:id
@@ -68,11 +68,29 @@ class Api::V1::DreamsController < ApplicationController
     end
   end
 
+  # POST /dreams/:id/restore
+  def restore
+    if check_access
+      if @dream.deleted
+        @dream.deleted = false
+        if @dream.save
+          render json: { message: 'Dream successfully restored.' }, status: 200
+        else
+          render json: { error: "Failed to restore dream: #{@dream.errors.full_messages.to_sentence}" }, status: 400
+        end
+      else
+        render json: { message: 'Dream is not deleted and cannot be restored.' }, status: 400
+      end
+    end
+  end
 
   def search
     query = params[:query]
+    
     @dreams = Dream.where(user_id: current_user.id)
-                 .where("description ILIKE ?", "%#{query}%")
+                   .where("description ILIKE ?", "%#{query}%")
+                   .where(completed: false)
+    
     render json: { dreams: @dreams }
   end
 

@@ -11,6 +11,9 @@ Rails.application.routes.draw do
       resources :dreams do
         resources :interpretations
         get 'search', on: :collection
+        member do
+          post 'restore'
+        end
       end
     end
   end
